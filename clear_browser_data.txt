@@ -1,0 +1,10 @@
+// Run this in browser console to clear all stored data
+localStorage.clear();
+sessionStorage.clear();
+
+// Or clear specific keys:
+localStorage.removeItem('petData');
+localStorage.removeItem('adoptionRequests');
+localStorage.removeItem('userData');
+
+console.log('All browser data cleared!');

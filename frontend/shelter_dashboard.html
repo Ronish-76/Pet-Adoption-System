@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shelter Dashboard - PawMatch</title>
+    <script src="js/shelterDataManager.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #28a745;
+            --primary-light: #34ce57;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--gray-50);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .shelter-auth-required {
+            display: none;
+        }
+
+        .shelter-unauth-only {
+            display: inline;
+        }
+
+        .shelter-logout-link {
+            display: none;
+            color: var(--error);
+            cursor: pointer;
+        }
+
+        .shelter-dashboard-link {
+            display: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            color: var(--gray-600);
+            font-size: 1.125rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--gray-500);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-600);
+        }
+
+        .btn-danger {
+            background: var(--error);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Pets Grid */
+        .pets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .pet-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .pet-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .pet-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            font-size: 3rem;
+        }
+
+        .pet-content {
+            padding: 1.5rem;
+        }
+
+        .pet-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .pet-details {
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .pet-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .status-available {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-adopted {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--gray-500);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .pet-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pet-actions .btn {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .spinner {
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error States */
+        .error-message {
+            background: #fef2f2;
+            color: var(--error);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-600);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            margin-bottom: 2rem;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification-success {
+            background: var(--success);
+        }
+
+        .notification-error {
+            background: var(--error);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pets-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pet-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="landing.html" class="logo">PawMatch</a>
+            <div class="nav-links">
+                <a href="shelter_dashboard.html" class="shelter-dashboard-link">Dashboard</a>
+                <a href="shelter_adoptions.html" class="shelter-auth-required">Adoption Requests</a>
+                <span class="shelter-info shelter-auth-required">Shelter</span>
+                <span class="shelter-logout-link shelter-auth-required">Logout</span>
+                <a href="shelter_login.html" class="shelter-unauth-only">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Shelter Dashboard</h1>
+            <p class="page-subtitle">Manage your pets and adoption requests</p>
+        </div>
+
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading dashboard...</p>
+        </div>
+
+        <div id="errorState" class="error-message" style="display: none;">
+            <p>Failed to load dashboard. Please try again later.</p>
+        </div>
+
+        <div id="dashboardContent" style="display: none;">
+            <div class="dashboard-grid">
+                <!-- Add Pet Form -->
+                <div class="card">
+                    <h2>Add New Pet</h2>
+                    <form id="addPetForm">
+                        <div class="form-group">
+                            <label for="petName">Pet Name</label>
+                            <input type="text" id="petName" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petType">Pet Type</label>
+                            <select id="petType" name="pet_type" required>
+                                <option value="">Select pet type</option>
+                                <option value="dog">Dog</option>
+                                <option value="cat">Cat</option>
+                                <option value="bird">Bird</option>
+                                <option value="fish">Fish</option>
+                                <option value="rabbit">Rabbit</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petBreed">Breed</label>
+                            <input type="text" id="petBreed" name="breed">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petAge">Age (years)</label>
+                            <input type="number" id="petAge" name="age" min="0" max="30" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petGender">Gender</label>
+                            <select id="petGender" name="gender" required>
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="unknown">Unknown</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petDescription">Description</label>
+                            <textarea id="petDescription" name="description"
+                                placeholder="Tell us about this pet..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn" id="addPetBtn">Add Pet</button>
+                    </form>
+                </div>
+
+                <!-- Shelter Info -->
+                <div class="card">
+                    <h2>Shelter Information</h2>
+                    <div id="shelterInfo">
+                        <p><strong>Shelter Name:</strong> <span id="shelterName">Loading...</span></p>
+                        <p><strong>Email:</strong> <span id="shelterEmail">Loading...</span></p>
+                        <p><strong>Total Pets:</strong> <span id="totalPets">Loading...</span></p>
+                        <p><strong>Available Pets:</strong> <span id="availablePets">Loading...</span></p>
+                        <p><strong>Pending Adoptions:</strong> <span id="pendingAdoptions">Loading...</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pets List -->
+            <div class="card">
+                <h2>Your Pets</h2>
+                <div id="loadingPets" class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading pets...</p>
+                </div>
+
+                <div id="emptyPets" class="empty-state" style="display: none;">
+                    <h3>No pets yet</h3>
+                    <p>Add your first pet using the form on the left!</p>
+                </div>
+
+                <div id="petsGrid" class="pets-grid" style="display: none;">
+                    <!-- Pet cards will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Pet image arrays
+        const dogImages = ['assets/dog1.jpg', 'assets/dog2.jpg', 'assets/dog3.jpg'];
+        const catImages = ['assets/cat1.jpg'];
+        
+        function getRandomPetImage(petType) {
+            const type = petType?.toLowerCase();
+            if (type === 'dog') {
+                return dogImages[Math.floor(Math.random() * dogImages.length)];
+            } else if (type === 'cat') {
+                return catImages[Math.floor(Math.random() * catImages.length)];
+            }
+            return 'assets/dog1.jpg'; // default
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Wait for shelterDataManager to initialize
+            setTimeout(() => {
+                // Check if shelter is authenticated
+                if (!window.shelterDataManager || !window.shelterDataManager.isAuthenticated) {
+                    console.log('Not authenticated, redirecting to login');
+                    window.location.href = 'shelter_login.html';
+                    return;
+                }
+                
+                console.log('Authenticated, loading dashboard');
+                loadDashboard();
+            }, 100);
+        });
+
+        async function loadDashboard() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const dashboardContent = document.getElementById('dashboardContent');
+
+            try {
+                // Show loading state
+                loadingState.style.display = 'block';
+                errorState.style.display = 'none';
+                dashboardContent.style.display = 'none';
+
+                // Load shelter profile and pets
+                const [profileResult, petsResult] = await Promise.all([
+                    window.shelterDataManager.getShelterProfile(),
+                    window.shelterDataManager.getShelterPets()
+                ]);
+
+                if (profileResult.success && petsResult.success) {
+                    displayDashboard(profileResult.data, petsResult.data);
+                } else {
+                    throw new Error('Failed to load dashboard data');
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+
+                // Show error state
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+                errorState.querySelector('p').textContent = error.message || 'Failed to load dashboard. Please try again later.';
+            }
+        }
+
+        function displayDashboard(profile, petsData) {
+            const loadingState = document.getElementById('loadingState');
+            const dashboardContent = document.getElementById('dashboardContent');
+
+            // Hide loading state
+            loadingState.style.display = 'none';
+
+            // Update shelter info
+            document.getElementById('shelterName').textContent = profile.profile.shelter_name || profile.username;
+            document.getElementById('shelterEmail').textContent = profile.email;
+
+            // Update pets statistics
+            const pets = petsData.results || petsData;
+            const availablePets = pets.filter(pet => pet.status === 'available').length;
+            const adoptedPets = pets.filter(pet => pet.status === 'adopted').length;
+            const pendingPets = pets.filter(pet => pet.status === 'pending').length;
+
+            document.getElementById('totalPets').textContent = pets.length;
+            document.getElementById('availablePets').textContent = availablePets;
+            document.getElementById('pendingAdoptions').textContent = pendingPets;
+
+            // Display pets
+            displayPets(pets);
+
+            // Show dashboard content
+            dashboardContent.style.display = 'block';
+        }
+
+        function displayPets(pets) {
+            const loadingPets = document.getElementById('loadingPets');
+            const emptyPets = document.getElementById('emptyPets');
+            const petsGrid = document.getElementById('petsGrid');
+
+            // Hide loading state
+            loadingPets.style.display = 'none';
+
+            if (pets && pets.length > 0) {
+                // Clear existing content
+                petsGrid.innerHTML = '';
+
+                // Create pet cards
+                pets.forEach(pet => {
+                    const petCard = createPetCard(pet);
+                    petsGrid.appendChild(petCard);
+                });
+
+                // Show pets grid
+                petsGrid.style.display = 'grid';
+                emptyPets.style.display = 'none';
+            } else {
+                // Show empty state
+                emptyPets.style.display = 'block';
+                petsGrid.style.display = 'none';
+            }
+        }
+
+        function createPetCard(pet) {
+            const card = document.createElement('div');
+            card.className = 'pet-card';
+
+            // Use random image based on pet type if none provided
+            const imageUrl = pet.image || getRandomPetImage(pet.pet_type);
+            const imageContent = imageUrl ?
+                `<img src="${imageUrl}" alt="${pet.name}" class="pet-image" onerror="this.src='${getRandomPetImage(pet.pet_type)}'">` :
+                `<div class="pet-image">🐾</div>`;
+
+            // Format age
+            const ageText = pet.age === 1 ? '1 year old' : `${pet.age} years old`;
+
+            // Format status
+            const statusClass = `status-${pet.status}`;
+            const statusText = pet.status.charAt(0).toUpperCase() + pet.status.slice(1);
+
+            card.innerHTML = `
+                ${imageContent}
+                <div class="pet-content">
+                    <h3 class="pet-name">${pet.name}</h3>
+                    <div class="pet-details">
+                        ${pet.breed || 'Unknown Breed'} • ${ageText} • ${pet.gender_display || pet.gender}
+                    </div>
+                    <span class="pet-status ${statusClass}">${statusText}</span>
+                    <div class="pet-actions">
+                        <button class="btn btn-secondary" onclick="editPet(${pet.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deletePet(${pet.id})">Delete</button>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Add Pet Form Handler
+        document.getElementById('addPetForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const petData = {
+                name: formData.get('name'),
+                pet_type: formData.get('pet_type'),
+                breed: formData.get('breed'),
+                age: parseInt(formData.get('age')),
+                gender: formData.get('gender'),
+                description: formData.get('description'),
+                status: 'available'
+            };
+
+            const addPetBtn = document.getElementById('addPetBtn');
+            addPetBtn.disabled = true;
+            addPetBtn.textContent = 'Adding Pet...';
+
+            try {
+                const result = await window.shelterDataManager.createPet(petData);
+
+                if (result.success) {
+                    showNotification('Pet added successfully!', 'success');
+                    e.target.reset();
+                    // Reload dashboard to show new pet
+                    loadDashboard();
+                } else {
+                    showNotification(result.error || 'Failed to add pet', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding pet:', error);
+                showNotification('An error occurred while adding the pet', 'error');
+            } finally {
+                addPetBtn.disabled = false;
+                addPetBtn.textContent = 'Add Pet';
+            }
+        });
+
+        function editPet(petId) {
+            // For now, just show a notification
+            showNotification('Edit functionality coming soon!', 'info');
+        }
+
+        async function deletePet(petId) {
+            if (!confirm('Are you sure you want to delete this pet? This action cannot be undone.')) {
+                return;
+            }
+
+            try {
+                const result = await window.shelterDataManager.deletePet(petId);
+
+                if (result.success) {
+                    showNotification('Pet deleted successfully!', 'success');
+                    // Reload dashboard
+                    loadDashboard();
+                } else {
+                    showNotification(result.error || 'Failed to delete pet', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting pet:', error);
+                showNotification('An error occurred while deleting the pet', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Check authentication status on page load
+        if (window.shelterDataManager) {
+            window.shelterDataManager.checkAuthStatus();
+        }
+    </script>
+</body>
+
+</html>

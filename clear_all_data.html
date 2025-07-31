@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear All Data</title>
+</head>
+<body>
+    <h1>Data Reset Complete</h1>
+    <p>Click the button below to clear all browser data:</p>
+    <button onclick="clearAllData()">Clear Browser Data</button>
+    <div id="status"></div>
+
+    <script>
+        function clearAllData() {
+            // Clear all localStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear specific keys if they exist
+            localStorage.removeItem('petData');
+            localStorage.removeItem('adoptionRequests');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('shelterLoggedIn');
+            localStorage.removeItem('shelterName');
+            
+            document.getElementById('status').innerHTML = '<p style="color: green;">✅ All browser data cleared successfully!</p>';
+            
+            console.log('All data cleared:');
+            console.log('localStorage length:', localStorage.length);
+            console.log('sessionStorage length:', sessionStorage.length);
+        }
+        
+        // Auto-clear on page load
+        window.onload = function() {
+            clearAllData();
+            
+            // Also clear specific adoption data keys
+            localStorage.removeItem('adoptionData');
+            localStorage.removeItem('loggedInUser');
+            
+            document.getElementById('status').innerHTML += '<p style="color: blue;">✅ All adoption and profile data cleared!</p>';
+        }
+    </script>
+</body>
+</html>

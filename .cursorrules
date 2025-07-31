@@ -1,0 +1,232 @@
+# 🐾 Pet Adoption Platform - Cursor Rules
+
+## 📋 Project Overview
+
+This is a Django-based Pet Adoption Platform with the following tech stack:
+
+- **Backend**: Django 5.2.4 + Django REST Framework + JWT Authentication
+- **Database**: MySQL (production) / SQLite (development)
+- **Frontend**: HTML/CSS/JavaScript (no React preference)
+- **Styling**: Tailwind CSS
+- **Admin**: Django Jazzmin
+- **API Documentation**: drf-yasg (Swagger)
+
+## 🏗️ Project Structure
+
+```
+Pet Adoption PL/
+├── accounts/          # User authentication & profiles
+├── adoption/          # Adoption requests & management
+├── chat/             # Messaging system
+├── core/             # Django settings & configuration
+├── frontend/         # Static HTML/CSS/JS files
+├── pets/             # Pet listings & management
+└── staticfiles/      # Collected static files
+```
+
+## 🐍 Python & Django Best Practices
+
+### Code Style & Organization
+
+- Follow PEP 8 style guidelines
+- Use meaningful variable and function names
+- Keep functions under 50 lines when possible
+- Use type hints for function parameters and return values
+- Group related functionality in Django apps
+- Use `__init__.py` files to make directories Python packages
+
+### Django Models
+
+- Use descriptive field names
+- Add `verbose_name` and `help_text` for admin interface
+- Use appropriate field types (CharField, TextField, DateTimeField, etc.)
+- Implement `__str__` methods for all models
+- Use `Meta` class for model configuration
+- Add database indexes for frequently queried fields
+
+### Django Views
+
+- Use class-based views (CBVs) when possible
+- Implement proper permission classes
+- Use serializers for data validation
+- Handle exceptions gracefully
+- Return appropriate HTTP status codes
+
+### Django REST Framework
+
+- Use ViewSets for CRUD operations
+- Implement proper serializers with validation
+- Use permission classes for access control
+- Add pagination for list endpoints
+- Use filters for search and filtering functionality
+
+## 🔐 Authentication & Security
+
+- Use JWT tokens for API authentication
+- Implement proper permission classes
+- Validate user input thoroughly
+- Use environment variables for sensitive data
+- Never commit secrets to version control
+
+## 🎨 Frontend Guidelines
+
+### HTML Structure
+
+- Use semantic HTML elements
+- Ensure proper accessibility (ARIA labels, alt text)
+- Keep HTML clean and well-structured
+- Use consistent indentation
+
+### CSS/Styling
+
+- Use Tailwind CSS utility classes
+- Keep custom CSS minimal
+- Ensure responsive design
+- Use consistent color schemes and spacing
+- Follow mobile-first approach
+
+### JavaScript
+
+- Use vanilla JavaScript (no React)
+- Keep functions small and focused
+- Handle errors gracefully
+- Use async/await for API calls
+- Add proper error handling for user feedback
+
+## 📁 File Organization
+
+### Django Apps
+
+- Each app should have a single responsibility
+- Use `urls.py` for routing within apps
+- Keep `views.py` organized with clear sections
+- Use `serializers.py` for DRF serializers
+- Implement proper `admin.py` configurations
+
+### Static Files
+
+- Organize CSS in `frontend/css/`
+- Organize JavaScript in `frontend/js/`
+- Use `frontend/pages/` for HTML templates
+- Keep assets organized by type
+
+## 🧪 Testing Guidelines
+
+- Write tests for all models, views, and serializers
+- Use Django's TestCase for database tests
+- Mock external API calls
+- Test both success and failure scenarios
+- Aim for high test coverage
+
+## 📚 Documentation
+
+- Use docstrings for all functions and classes
+- Document API endpoints with proper descriptions
+- Keep README files updated
+- Use comments for complex logic
+- Document environment variables
+
+## 🔧 Development Workflow
+
+- Use meaningful commit messages
+- Test changes before committing
+- Follow the existing code style
+- Update requirements.txt when adding dependencies
+- Use virtual environments for development
+
+## 🚀 Deployment Considerations
+
+- Use environment variables for configuration
+- Configure proper database settings
+- Set up static file serving
+- Use production-ready WSGI server (Gunicorn)
+- Implement proper logging
+
+## 🐛 Common Issues & Solutions
+
+- Always run migrations after model changes
+- Check for circular imports in Django apps
+- Ensure proper CORS settings for API
+- Validate JWT token expiration
+- Handle database connection issues gracefully
+
+## 📝 Code Examples
+
+### Model Example
+
+```python
+from django.db import models
+from django.contrib.auth.models import User
+
+class Pet(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Pet Name")
+    species = models.CharField(max_length=50, choices=SPECIES_CHOICES)
+    age = models.PositiveIntegerField(help_text="Age in years")
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Pet"
+        verbose_name_plural = "Pets"
+
+    def __str__(self):
+        return f"{self.name} ({self.species})"
+```
+
+### ViewSet Example
+
+```python
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from .models import Pet
+from .serializers import PetSerializer
+
+class PetViewSet(viewsets.ModelViewSet):
+    queryset = Pet.objects.all()
+    serializer_class = PetSerializer
+    permission_classes = [IsAuthenticated]
+    filterset_fields = ['species', 'age']
+    search_fields = ['name', 'description']
+```
+
+### Serializer Example
+
+```python
+from rest_framework import serializers
+from .models import Pet
+
+class PetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pet
+        fields = ['id', 'name', 'species', 'age', 'description', 'created_at']
+        read_only_fields = ['id', 'created_at']
+```
+
+## 🎯 Project-Specific Rules
+
+- Always use the existing app structure (accounts, adoption, chat, pets)
+- Follow the established URL patterns
+- Use the existing permission classes
+- Maintain consistency with the current admin interface
+- Keep the frontend simple and functional
+- Ensure all pet-related functionality goes through the pets app
+- Handle adoption requests through the adoption app
+- Use the chat app for messaging features
+
+## 🔍 Code Review Checklist
+
+- [ ] Code follows PEP 8 style
+- [ ] Functions have proper docstrings
+- [ ] Models have appropriate fields and methods
+- [ ] Views handle errors properly
+- [ ] Serializers validate data correctly
+- [ ] URLs are properly configured
+- [ ] Admin interface is configured
+- [ ] Tests are written and passing
+- [ ] No hardcoded secrets
+- [ ] Proper permission classes are used
+- [ ] Frontend is responsive and accessible
+- [ ] API endpoints are documented
+
+Remember: This is a pet adoption platform focused on helping animals find homes. Keep the user experience simple, intuitive, and compassionate! 🐕🐱

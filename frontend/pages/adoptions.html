@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Adoptions - PawMatch</title>
+    <script src="../js/dataManager.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--gray-50);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--gray-700);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .auth-required {
+            display: none;
+        }
+
+        .unauth-only {
+            display: inline;
+        }
+
+        .logout-link {
+            display: none;
+            color: var(--error);
+            cursor: pointer;
+        }
+
+        .profile-link {
+            display: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            color: var(--gray-600);
+            font-size: 1.125rem;
+        }
+
+        /* Adoption Cards */
+        .adoptions-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .adoption-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .adoption-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .adoption-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .pet-info {
+            flex: 1;
+        }
+
+        .pet-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .pet-details {
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-approved {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+        }
+
+        .adoption-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .detail-value {
+            color: var(--gray-900);
+        }
+
+        .adoption-reason {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .reason-label {
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .reason-text {
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .spinner {
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Error States */
+        .error-message {
+            background: #fef2f2;
+            color: var(--error);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-600);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            margin-bottom: 2rem;
+        }
+
+        .browse-pets-btn {
+            background: var(--primary);
+            color: var(--white);
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .browse-pets-btn:hover {
+            background: var(--primary-light);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            color: var(--white);
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-left p {
+            color: var(--gray-400);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification-success {
+            background: var(--success);
+        }
+
+        .notification-error {
+            background: var(--error);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2rem;
+            }
+
+            .adoption-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="home.html" class="logo">PawMatch</a>
+            <div class="nav-links">
+                <a href="pets.html">Browse Pets</a>
+                <a href="adoptions.html" class="auth-required">My Adoptions</a>
+                <a href="profile.html" class="profile-link">Profile</a>
+                <a href="login.html" class="unauth-only">Login</a>
+                <a href="register.html" class="unauth-only">Register</a>
+                <span class="logout-link auth-required">Logout</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">My Adoption Requests</h1>
+            <p class="page-subtitle">Track the status of your pet adoption applications</p>
+        </div>
+
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your adoption requests...</p>
+        </div>
+
+        <div id="errorState" class="error-message" style="display: none;">
+            <p>Failed to load adoption requests. Please try again later.</p>
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h3>No adoption requests yet</h3>
+            <p>You haven't submitted any adoption requests yet. Start by browsing available pets!</p>
+            <a href="pets.html" class="browse-pets-btn">Browse Available Pets</a>
+        </div>
+
+        <div id="adoptionsGrid" class="adoptions-grid" style="display: none;">
+            <!-- Adoption cards will be dynamically loaded here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-left">
+                <div class="footer-logo">PawMatch</div>
+                <p>Connecting loving families with pets in need of homes</p>
+            </div>
+            <div class="footer-links">
+                <a href="#" class="footer-link">About Us</a>
+                <a href="#" class="footer-link">Success Stories</a>
+                <a href="#" class="footer-link">Contact</a>
+                <a href="#" class="footer-link">Privacy Policy</a>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-700); color: var(--gray-400);">
+            © 2025 PawMatch. All rights reserved. Made with ❤️ for pets and families.
+        </div>
+    </footer>
+
+    <script>
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check if user is authenticated
+            if (!window.dataManager || !window.dataManager.isAuthenticated) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            loadAdoptionRequests();
+        });
+
+        async function loadAdoptionRequests() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const emptyState = document.getElementById('emptyState');
+            const adoptionsGrid = document.getElementById('adoptionsGrid');
+
+            try {
+                // Show loading state
+                loadingState.style.display = 'block';
+                errorState.style.display = 'none';
+                emptyState.style.display = 'none';
+                adoptionsGrid.style.display = 'none';
+
+                // Load adoption requests from the database
+                const result = await window.dataManager.getAdoptionRequests();
+
+                if (result.success) {
+                    const adoptions = result.data.results || result.data;
+
+                    if (adoptions && adoptions.length > 0) {
+                        displayAdoptions(adoptions);
+                    } else {
+                        // Show empty state
+                        loadingState.style.display = 'none';
+                        emptyState.style.display = 'block';
+                    }
+                } else {
+                    throw new Error(result.error || 'Failed to load adoption requests');
+                }
+            } catch (error) {
+                console.error('Error loading adoption requests:', error);
+
+                // Show error state
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+                errorState.querySelector('p').textContent = error.message || 'Failed to load adoption requests. Please try again later.';
+            }
+        }
+
+        function displayAdoptions(adoptions) {
+            const adoptionsGrid = document.getElementById('adoptionsGrid');
+            const loadingState = document.getElementById('loadingState');
+
+            // Hide loading state
+            loadingState.style.display = 'none';
+
+            // Clear existing content
+            adoptionsGrid.innerHTML = '';
+
+            // Create adoption cards
+            adoptions.forEach(adoption => {
+                const adoptionCard = createAdoptionCard(adoption);
+                adoptionsGrid.appendChild(adoptionCard);
+            });
+
+            // Show adoptions grid
+            adoptionsGrid.style.display = 'grid';
+        }
+
+        function createAdoptionCard(adoption) {
+            const card = document.createElement('div');
+            card.className = 'adoption-card';
+
+            // Format dates properly - use current date if not provided
+            const requestDate = adoption.created_at ? new Date(adoption.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }) : new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+            
+            const responseDate = adoption.response_date ? new Date(adoption.response_date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }) : (adoption.status === 'pending' ? 'Pending Review' : 'Not Responded');
+
+            // Get status badge class
+            const statusClass = `status-${adoption.status}`;
+            const statusText = adoption.status.charAt(0).toUpperCase() + adoption.status.slice(1);
+
+            card.innerHTML = `
+                <div class="adoption-header">
+                    <div class="pet-info">
+                        <h3 class="pet-name">${adoption.pet_name || 'Unknown Pet'}</h3>
+                        <div class="pet-details">
+                            ${adoption.pet_breed || 'Unknown Breed'} • ${adoption.pet_age || 'Unknown Age'} years old
+                        </div>
+                    </div>
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
+
+                <div class="adoption-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Request Date:</span>
+                        <span class="detail-value">${requestDate}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Response Date:</span>
+                        <span class="detail-value">${responseDate}</span>
+                    </div>
+                    ${adoption.admin_notes ? `
+                    <div class="detail-row">
+                        <span class="detail-label">Admin Notes:</span>
+                        <span class="detail-value">${adoption.admin_notes}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                ${adoption.reason ? `
+                <div class="adoption-reason">
+                    <div class="reason-label">Your Adoption Reason:</div>
+                    <div class="reason-text">${adoption.reason}</div>
+                </div>
+                ` : ''}
+            `;
+
+            return card;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Check authentication status on page load
+        if (window.dataManager) {
+            window.dataManager.checkAuthStatus();
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pet Adoption API Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .endpoint { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .method { color: white; padding: 5px 10px; border-radius: 3px; }
+        .get { background: #61affe; }
+        .post { background: #49cc90; }
+        .put { background: #fca130; }
+        .delete { background: #f93e3e; }
+    </style>
+</head>
+<body>
+    <h1>Pet Adoption API Documentation</h1>
+    
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> /api/pets/</h3>
+        <p>Get list of all available pets</p>
+    </div>
+    
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> /api/pets/{id}/</h3>
+        <p>Get details of a specific pet</p>
+    </div>
+    
+    <div class="endpoint">
+        <h3><span class="method post">POST</span> /api/accounts/register/</h3>
+        <p>Register a new user account</p>
+    </div>
+    
+    <div class="endpoint">
+        <h3><span class="method post">POST</span> /api/accounts/login/</h3>
+        <p>Login user</p>
+    </div>
+    
+    <div class="endpoint">
+        <h3><span class="method post">POST</span> /api/adoptions/</h3>
+        <p>Submit adoption request</p>
+    </div>
+    
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> /api/adoptions/</h3>
+        <p>Get adoption requests (admin only)</p>
+    </div>
+    
+    <p><strong>Base URL:</strong> http://127.0.0.1:8000</p>
+    <p><strong>Authentication:</strong> Session-based authentication</p>
+</body>
+</html>
